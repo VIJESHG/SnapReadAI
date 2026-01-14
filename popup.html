@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --primary: #4285f4;
+      --primary-hover: #3367d6;
+      --bg-color: #f9f9f9;
+      --card-bg: #ffffff;
+      --text-main: #202124;
+      --text-secondary: #5f6368;
+    }
+
+    body {
+      width: 350px;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    /* Header styling */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px; /* Increased gap slightly for the image */
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* NEW: Styling for your Logo Image */
+    .logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain; /* Ensures logo doesn't stretch weirdly */
+    }
+
+    /* Controls Section */
+    .controls {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--primary);
+    }
+
+    /* Button Styling */
+    button {
+      background: linear-gradient(135deg, #4285f4, #34a853);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 6px rgba(66, 133, 244, 0.2);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      box-shadow: 0 6px 8px rgba(66, 133, 244, 0.3);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(66, 133, 244, 0.2);
+    }
+
+    /* Status & Loader */
+    #status {
+      margin-top: 15px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      min-height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* CSS Spinner */
+    .loader {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none; /* Hidden by default */
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Results Card */
+    #summary {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #3c4043;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: none;
+      border-left: 4px solid var(--primary);
+    }
+
+    /* Better bullet points styling inside summary */
+    #summary ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    
+    #summary li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="SnapReadAI.png" alt="Logo" class="logo">
+    <h2>SnapReadAI</h2>
+  </header>
+  
+  <div class="controls">
+    <label for="pointCount">Bullet Points</label>
+    <input type="number" id="pointCount" value="3" min="1" max="10">
+  </div>
+
+  <button id="summarizeBtn">Summarize Page</button>
+
+  <div id="status">
+    <div class="loader" id="loader"></div>
+    <span id="statusText">Ready to summarize.</span>
+  </div>
+
+  <div id="summary"></div>
+
+  <script src="popup.js"></script>
+  
+  <script>
+    const btn = document.getElementById('summarizeBtn');
+    const loader = document.getElementById('loader');
+    const statusText = document.getElementById('statusText');
+    const summary = document.getElementById('summary');
+
+    btn.addEventListener('click', () => {
+      // Reset UI
+      summary.style.display = 'none';
+      loader.style.display = 'block';
+      statusText.textContent = "Processing...";
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+      btn.style.cursor = "not-allowed";
+    });
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+           const text = statusText.textContent.toLowerCase();
+           if (text.includes("done") || text.includes("error") || text.includes("failed")) {
+             loader.style.display = 'none';
+             btn.disabled = false;
+             btn.style.opacity = "1";
+             btn.style.cursor = "pointer";
+           }
+        }
+      });
+    });
+    
+    observer.observe(document.getElementById('status'), { childList: true, subtree: true });
+  </script>
+</body>
+</html>

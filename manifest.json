@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "SnapReadAI",
+    "version": "1.0",
+    "description": "Instantly summarize pages using AI.",
+    "permissions": ["activeTab", "scripting", "identity"],
+    "oauth2": {
+      "client_id": "PASTE_YOUR_CLIENT_ID_HERE",
+      "scopes": [
+        "https://www.googleapis.com/auth/generative-language.retriever"
+      ]
+    },
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
